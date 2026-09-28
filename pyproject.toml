@@ -1,0 +1,25 @@
+[project]
+name = "scifind"
+version = "0.1.0"
+description = "scifind is a semantic document finding program"
+readme = "README.md"
+authors = [
+    { name = "Maddock García", email = "maddock.garcia0724@jala.university" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "ipykernel>=7.3.0",
+    "ipywidgets>=8.1.9",
+    "kagglehub[polars-datasets]>=1.0.2",
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.3",
+    "pandas>=3.0.6",
+    "sentence-transformers>=6.1.0",
+]
+
+[project.scripts]
+capstone = "capstone:main"
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13.0"]
+build-backend = "uv_build"
