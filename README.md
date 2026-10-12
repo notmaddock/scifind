@@ -16,7 +16,7 @@ Data for this project will be acquired through two paths:
 
 The architecture for scifind is based around Python and ChromaDB with a frontend, API and database. [Chroma](https://www.trychroma.com) will store embedding vectors. The Sentence Transformer models has a limited context width, so documents will be chunked and vectorized in parts.
 
-![](image.png)
+![](docs/assets/architecture-diagram.png)
 
 The frontend will be a React app connected to the backend through HTTP.
 
