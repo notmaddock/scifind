@@ -3043,6 +3043,7 @@ dependencies = [
     { name = "pypdf" },
     { name = "sentence-transformers" },
     { name = "torch" },
+    { name = "tqdm" },
 ]
 
 [package.metadata]
@@ -3060,6 +3061,7 @@ requires-dist = [
     { name = "pypdf", specifier = ">=6.20.1" },
     { name = "sentence-transformers", specifier = ">=6.1.0" },
     { name = "torch", specifier = "==2.14.1" },
+    { name = "tqdm", specifier = ">=4.70.1" },
 ]
 
 [[package]]
