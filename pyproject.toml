@@ -4,9 +4,9 @@ version = "0.1.0"
 description = "scifind is a semantic document finding program"
 readme = "README.md"
 authors = [
-    { name = "Maddock García", email = "maddock.garcia0724@jala.university" }
+    { name = "Maddock García", email = "notmaddock@gmail.com" }
 ]
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
     "chromadb>=1.5.9",
     "ipykernel==7.4.0",
