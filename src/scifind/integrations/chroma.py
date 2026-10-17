@@ -2,7 +2,9 @@ from pathlib import Path
 import chromadb
 from chromadb.api import ClientAPI
 
-CHROMA_PATH = Path("chroma")
+from scifind.root import REPO_ROOT
+
+CHROMA_PATH = REPO_ROOT / "chroma"
 
 ALL_DOCUMENTS_COLLECTION_NAME: str = "all_documents"
 DOCUMENT_CHUNKS_COLLECTION_NAME: str = "document_chunks"
