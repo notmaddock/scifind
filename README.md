@@ -2,6 +2,27 @@
 
 scifind is a semantic document finding program based on [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) (Apache 2.0).
 
+## Run locally
+
+From the `scifind` directory, run:
+
+```bash
+uv run scifind
+```
+
+uv installs the app and its dependencies into `scifind/.venv` automatically,
+using `scifind/uv.lock`. No virtual environment activation is required.
+The API runs at http://127.0.0.1:8000; press Ctrl+C to stop it.
+
+scifind is an independent uv project within the vault repository, with its own
+dependencies, lockfile, and virtual environment.
+
+Run the tests from the same directory:
+
+```bash
+uv run test
+```
+
 ## Partial Capstone submission requirements
 
 ### Data acquisition

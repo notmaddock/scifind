@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "chromadb>=1.5.9",
+    "fastapi==0.143.2",
     "ipykernel==7.4.0",
     "ipywidgets>=8.1.9",
     "kagglehub[polars-datasets]>=1.0.2",
@@ -19,13 +20,20 @@ dependencies = [
     "polars==2.0.0",
     "pympler>=1.1",
     "pypdf>=6.20.1",
+    "python-multipart",
+    "scalar-fastapi>=1.9.1",
     "sentence-transformers>=6.1.0",
     "torch==2.14.1",
     "tqdm>=4.70.1",
+    "uvicorn",
 ]
 
+[dependency-groups]
+dev = ["httpx"]
+
 [project.scripts]
-capstone = "capstone:main"
+scifind = "scifind.cli:main"
+test = "scifind.cli:run_tests"
 
 [build-system]
 requires = ["uv_build>=0.12.19,<0.13.0"]
