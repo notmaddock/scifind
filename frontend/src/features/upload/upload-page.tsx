@@ -11,6 +11,7 @@ import {
   DialogClose,
 } from '#/components/ui/dialog'
 import { useUpload } from './use-upload'
+import { BulkUpload } from './bulk-upload'
 import { cn } from '#/lib/utils'
 
 function scorePosition(score: number) {
@@ -179,6 +180,7 @@ export function UploadPage() {
             {error}
           </p>
         )}
+        <BulkUpload disabled={uploading} />
       </div>
       <Dialog
         open={resultOpen}
