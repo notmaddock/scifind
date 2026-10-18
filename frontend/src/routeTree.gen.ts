@@ -9,50 +9,134 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as SidebarRouteImport } from './routes/_sidebar'
+import { Route as SidebarIndexRouteImport } from './routes/_sidebar/index'
+import { Route as SidebarEmbeddingsIndexRouteImport } from './routes/_sidebar/embeddings/index'
+import { Route as SidebarSearchIndexRouteImport } from './routes/_sidebar/search/index'
+import { Route as SidebarUploadIndexRouteImport } from './routes/_sidebar/upload/index'
 
-const IndexRoute = IndexRouteImport.update({
+const SidebarRoute = SidebarRouteImport.update({
+  id: '/_sidebar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SidebarIndexRoute = SidebarIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => SidebarRoute,
+} as any)
+const SidebarEmbeddingsIndexRoute = SidebarEmbeddingsIndexRouteImport.update({
+  id: '/embeddings/',
+  path: '/embeddings/',
+  getParentRoute: () => SidebarRoute,
+} as any)
+const SidebarSearchIndexRoute = SidebarSearchIndexRouteImport.update({
+  id: '/search/',
+  path: '/search/',
+  getParentRoute: () => SidebarRoute,
+} as any)
+const SidebarUploadIndexRoute = SidebarUploadIndexRouteImport.update({
+  id: '/upload/',
+  path: '/upload/',
+  getParentRoute: () => SidebarRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof SidebarIndexRoute
+  '/embeddings/': typeof SidebarEmbeddingsIndexRoute
+  '/search/': typeof SidebarSearchIndexRoute
+  '/upload/': typeof SidebarUploadIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof SidebarIndexRoute
+  '/embeddings': typeof SidebarEmbeddingsIndexRoute
+  '/search': typeof SidebarSearchIndexRoute
+  '/upload': typeof SidebarUploadIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_sidebar': typeof SidebarRouteWithChildren
+  '/_sidebar/': typeof SidebarIndexRoute
+  '/_sidebar/embeddings/': typeof SidebarEmbeddingsIndexRoute
+  '/_sidebar/search/': typeof SidebarSearchIndexRoute
+  '/_sidebar/upload/': typeof SidebarUploadIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/embeddings/' | '/search/' | '/upload/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/embeddings' | '/search' | '/upload'
+  id:
+    | '__root__'
+    | '/_sidebar'
+    | '/_sidebar/'
+    | '/_sidebar/embeddings/'
+    | '/_sidebar/search/'
+    | '/_sidebar/upload/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  SidebarRoute: typeof SidebarRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_sidebar': {
+      id: '/_sidebar'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof SidebarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_sidebar/': {
+      id: '/_sidebar/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof SidebarIndexRouteImport
+      parentRoute: typeof SidebarRoute
+    }
+    '/_sidebar/embeddings/': {
+      id: '/_sidebar/embeddings/'
+      path: '/embeddings'
+      fullPath: '/embeddings/'
+      preLoaderRoute: typeof SidebarEmbeddingsIndexRouteImport
+      parentRoute: typeof SidebarRoute
+    }
+    '/_sidebar/search/': {
+      id: '/_sidebar/search/'
+      path: '/search'
+      fullPath: '/search/'
+      preLoaderRoute: typeof SidebarSearchIndexRouteImport
+      parentRoute: typeof SidebarRoute
+    }
+    '/_sidebar/upload/': {
+      id: '/_sidebar/upload/'
+      path: '/upload'
+      fullPath: '/upload/'
+      preLoaderRoute: typeof SidebarUploadIndexRouteImport
+      parentRoute: typeof SidebarRoute
     }
   }
 }
 
+interface SidebarRouteChildren {
+  SidebarIndexRoute: typeof SidebarIndexRoute
+  SidebarEmbeddingsIndexRoute: typeof SidebarEmbeddingsIndexRoute
+  SidebarSearchIndexRoute: typeof SidebarSearchIndexRoute
+  SidebarUploadIndexRoute: typeof SidebarUploadIndexRoute
+}
+
+const SidebarRouteChildren: SidebarRouteChildren = {
+  SidebarIndexRoute: SidebarIndexRoute,
+  SidebarEmbeddingsIndexRoute: SidebarEmbeddingsIndexRoute,
+  SidebarSearchIndexRoute: SidebarSearchIndexRoute,
+  SidebarUploadIndexRoute: SidebarUploadIndexRoute,
+}
+
+const SidebarRouteWithChildren =
+  SidebarRoute._addFileChildren(SidebarRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  SidebarRoute: SidebarRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
