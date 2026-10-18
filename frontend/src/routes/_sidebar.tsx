@@ -18,9 +18,9 @@ export const Route = createFileRoute('/_sidebar')({
 })
 
 type NavigationItem = {
-  title: string;
-  icon: LucideIcon;
-  href: string;
+  title: string
+  icon: LucideIcon
+  href: string
 }
 
 function Navigation() {
@@ -30,26 +30,27 @@ function Navigation() {
     { title: 'Embeddings', icon: GraphStarIcon, href: '/embeddings' },
   ]
 
+  return (
+    <>
+      {nav.map((n) => {
+        const Icon = n.icon
 
-  return <>
-    {nav.map(n => {
-      const Icon = n.icon
-
-      return (
-        <SidebarMenuItem key={n.href}>
-          <SidebarMenuButton render={<Link to={n.href} />}>
-            <Icon />
-            {n.title}
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      )
-    })}
-  </>
+        return (
+          <SidebarMenuItem key={n.href}>
+            <SidebarMenuButton render={<Link to={n.href} />}>
+              <Icon />
+              {n.title}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )
+      })}
+    </>
+  )
 }
 
 function RouteComponent() {
   return (
-    <SidebarProvider>
+    <SidebarProvider className="h-svh overflow-hidden">
       <Sidebar variant="inset">
         <SidebarHeader className="px-4 py-4">
           <h1 className="text-lg text-accent-foreground">scifind</h1>
@@ -58,14 +59,13 @@ function RouteComponent() {
           <SidebarMenu>
             <Navigation />
           </SidebarMenu>
-
         </SidebarContent>
       </Sidebar>
 
-      <SidebarInset>
-        <main className='h-full'>
+      <SidebarInset className="min-h-0 min-w-0 overflow-hidden">
+        <div className="min-h-0 flex-1 overflow-hidden">
           <Outlet />
-        </main>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )

@@ -1,12 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, type FormEvent } from 'react'
-import { SearchIcon } from 'lucide-react'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '#/components/ui/input-group'
+import { useState } from 'react'
+import { documentDownloadUrl } from '#/features/search/api'
+import { SearchPage } from '#/features/search/search-page'
+import { useSearch } from '#/features/search/use-search'
 
 export const Route = createFileRoute('/_sidebar/search/')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -17,51 +13,30 @@ export const Route = createFileRoute('/_sidebar/search/')({
 
 function RouteComponent() {
   const { q } = Route.useSearch()
+  return <SearchContainer key={q} q={q} />
+}
+
+function SearchContainer({ q }: { q: string }) {
   const navigate = useNavigate({ from: Route.fullPath })
   const [query, setQuery] = useState(q)
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    void navigate({ to: '/search', search: { q: query } })
-  }
-
-  if (q) {
-    return (
-      <main className="flex h-full flex-col gap-4 px-6 py-8">
-        <h1 className="text-accent-foreground text-2xl font-medium">Search results</h1>
-        <p>{q}</p>
-      </main>
-    )
-  }
+  const search = q.trim()
+  const results = useSearch(search)
 
   return (
-    <main className="flex h-full flex-col items-center justify-center gap-4 px-6">
-      <h1 className="text-accent-foreground text-2xl font-medium">scifind</h1>
-      <form className="w-full max-w-md" onSubmit={handleSubmit}>
-        <InputGroup className="h-12 rounded-full p-1.5">
-          <InputGroupInput
-            type="search"
-            className="[&::-webkit-search-cancel-button]:hidden"
-            placeholder="What are you looking for?"
-            aria-label="Search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          <InputGroupAddon
-            align="inline-end"
-            className="h-full py-0 pr-0 has-[>button]:mr-0"
-          >
-            <InputGroupButton
-              type="submit"
-              aria-label="Search"
-              size="icon-sm"
-              className="size-9 rounded-full bg-accent p-0 text-accent-foreground hover:bg-accent/80"
-            >
-              <SearchIcon aria-hidden="true" />
-            </InputGroupButton>
-          </InputGroupAddon>
-        </InputGroup>
-      </form>
-    </main>
+    <SearchPage
+      search={search}
+      query={query}
+      data={results.data}
+      isLoading={results.isLoading}
+      isFetching={results.isFetching}
+      isSuccess={results.isSuccess}
+      error={results.error?.message}
+      getDownloadUrl={documentDownloadUrl}
+      onQueryChange={setQuery}
+      onSubmit={() =>
+        void navigate({ to: '/search', search: { q: query.trim() } })
+      }
+      onRetry={() => void results.refetch()}
+    />
   )
 }

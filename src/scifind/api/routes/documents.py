@@ -1,9 +1,10 @@
 from typing import Annotated
 from collections.abc import Sequence
-from uuid import uuid4
+from uuid import UUID, uuid4
 from shutil import copyfileobj
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi.responses import FileResponse
 
 from scifind.documents.intake import DocumentIntakeError, extract_document
 from scifind.root import REPO_ROOT
@@ -84,3 +85,24 @@ def upload_document(
         return result
     except DocumentIntakeError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@router.get("/{document_id}/download")
+def download_document(document_id: UUID, processor: DocumentProcessorDep) -> FileResponse:
+    identifier = str(document_id)
+    result = processor.seeds.get(ids=[identifier], include=["metadatas"])
+    metadatas = result["metadatas"]
+    metadata = metadatas[0] if metadatas else None
+    if not metadata or metadata.get("type") != "upload":
+        raise HTTPException(status_code=404, detail="Document not found.")
+    file_format = metadata.get("format")
+    if file_format not in {"pdf", "txt"}:
+        raise HTTPException(status_code=404, detail="Document not found.")
+    original = UPLOAD_PATH / f"{identifier}.{file_format}"
+    if not original.is_file():
+        raise HTTPException(status_code=404, detail="Original file not found.")
+    return FileResponse(
+        original,
+        filename=str(metadata["filename"]),
+        media_type="application/pdf" if file_format == "pdf" else "text/plain",
+    )

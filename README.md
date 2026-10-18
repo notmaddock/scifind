@@ -23,6 +23,25 @@ Run the tests from the same directory:
 uv run test
 ```
 
+## Frontend
+
+With the API running, start the frontend in another terminal:
+
+```bash
+cd frontend
+pnpm install
+pnpm dev
+```
+
+Open http://localhost:3000. Search submits to `GET /api/search?q=...`.
+To change the API base URL, copy `frontend/.env.example` to `frontend/.env`
+and set `VITE_API_URL`. The URL is validated by t3-env; restart Vite after
+changing it (or rebuild for deployment).
+
+For a frontend hosted elsewhere, set `SCIFIND_FRONTEND_ORIGINS` on the API
+to a comma-separated list of allowed origins. It defaults to
+`http://localhost:3000,http://127.0.0.1:3000`.
+
 ## Partial Capstone submission requirements
 
 ### Data acquisition
