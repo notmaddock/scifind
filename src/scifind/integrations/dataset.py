@@ -4,6 +4,7 @@ import polars as pl
 
 # this file contains a bunch of hacks for ignoring errors from mypy because kagglehub just returns Any most times
 
+
 def load_arxiv_dataset() -> pl.LazyFrame:
     return cast(
         pl.LazyFrame,

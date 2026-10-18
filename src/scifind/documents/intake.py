@@ -34,12 +34,14 @@ def extract_document(source: BinaryIO, *, filename: str) -> ExtractedDocument:
         source.seek(0)
         if not source.read(1):
             raise DocumentIntakeError(f"File is empty: {filename}")
-        
+
         source.seek(0)
         if extension == ".pdf":
             return _extract_pdf(source, filename)
-        text = source.read().decode("utf-8-sig") #-sig handles some extra encoding stuff some documents have
-    
+        text = source.read().decode(
+            "utf-8-sig"
+        )  # -sig handles some extra encoding stuff some documents have
+
     except OSError as error:
         raise DocumentIntakeError(f"Could not read {filename}: {error}") from error
     except UnicodeDecodeError as error:
@@ -49,8 +51,10 @@ def extract_document(source: BinaryIO, *, filename: str) -> ExtractedDocument:
 
     if not text.strip():
         raise DocumentIntakeError("TXT file contains no non-whitespace text.")
-    
-    return ExtractedDocument(filename=filename, format="txt", segments=(TextSegment(text),))
+
+    return ExtractedDocument(
+        filename=filename, format="txt", segments=(TextSegment(text),)
+    )
 
 
 def _extract_pdf(source: BinaryIO, filename: str) -> ExtractedDocument:

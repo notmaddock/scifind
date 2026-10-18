@@ -3,7 +3,6 @@ from functools import cache
 from typing import cast
 
 import numpy as np
-from chromadb.api.collection_configuration import CollectionConfiguration
 from chromadb.api.models.Collection import Collection
 from chromadb.errors import InvalidDimensionException, NotFoundError
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -22,7 +21,7 @@ class ProcessingUnavailableError(RuntimeError):
 
 
 def ensure_collection_cosine(collection: Collection) -> None:
-    configuration = cast(CollectionConfiguration, collection.configuration)
+    configuration = cast(dict[str, dict[str, str] | None], collection.configuration)
     hnsw = configuration["hnsw"]
     if hnsw is None or hnsw.get("space") != "cosine":
         raise ProcessingUnavailableError(
@@ -147,7 +146,7 @@ class DocumentProcessor:
         return max(-1.0, min(1.0, 1 - distances[0][0]))
 
 
-@cache
+@cache  # type: ignore[misc]
 def get_document_processor() -> DocumentProcessor:
     try:
         seeds = get_chroma_client().get_collection(ALL_DOCUMENTS_COLLECTION_NAME)
