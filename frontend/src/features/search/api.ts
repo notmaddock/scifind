@@ -1,4 +1,4 @@
-import { env } from '#/env'
+import { apiUrl } from '#/lib/api'
 
 export type SearchResult = {
   id: string
@@ -8,8 +8,6 @@ export type SearchResult = {
   similarity: number
   page_number: number | null
 }
-
-const apiUrl = env.VITE_API_URL.replace(/\/$/, '')
 
 export function documentDownloadUrl(id: string) {
   return `${apiUrl}/api/documents/${encodeURIComponent(id)}/download`

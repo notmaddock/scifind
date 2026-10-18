@@ -1,9 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { UploadPage } from '#/features/upload/upload-page'
 
 export const Route = createFileRoute('/_sidebar/upload/')({
-  component: RouteComponent,
+  component: UploadPage,
 })
-
-function RouteComponent() {
-  return <div>Hello "/_sidebar/upload/"!</div>
-}
