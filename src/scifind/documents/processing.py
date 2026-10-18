@@ -57,7 +57,7 @@ class DocumentProcessor:
         model: SentenceTransformer,
         seeds: Collection,
         *,
-        threshold: float = 0.5,
+        threshold: float = 0.35,
         chunk_overlap: int = 32,
     ):
         if not -1 <= threshold <= 1:
