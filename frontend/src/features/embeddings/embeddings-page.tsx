@@ -11,7 +11,13 @@ import { useEmbeddings } from './use-embeddings'
 import type { ProjectionMethod } from './api'
 import { EmbeddingsPlot } from './embeddings-plot'
 
-export function EmbeddingsPage() {
+export function EmbeddingsPage({
+  documentId,
+  onClearFocus,
+}: {
+  documentId?: string
+  onClearFocus: () => void
+}) {
   const [method, setMethod] = useState<ProjectionMethod>('umap')
   const embeddings = useEmbeddings(method)
   const points = embeddings.data ?? []
@@ -64,7 +70,17 @@ export function EmbeddingsPage() {
                 ? ' · Upload at least 3 documents for a projection.'
                 : ''}
             </p>
-            <EmbeddingsPlot key={method} points={points} />
+            {documentId && !points.some((point) => point.id === documentId) && (
+              <p role="status" className="text-sm text-muted-foreground">
+                This document is not available in the embeddings visualization.
+              </p>
+            )}
+            <EmbeddingsPlot
+              key={method}
+              points={points}
+              documentId={documentId}
+              onClearFocus={onClearFocus}
+            />
           </>
         ))}
     </main>

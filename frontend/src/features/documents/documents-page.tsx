@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { DownloadIcon, FileTextIcon, Trash2Icon } from 'lucide-react'
+import {
+  LocateFixedIcon,
+  DownloadIcon,
+  FileTextIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import {
@@ -80,6 +85,16 @@ export function DocumentsPage() {
             </div>
             <div className="flex flex-wrap gap-2">
               <DocumentPreview document={document} />
+              <Button
+                variant="outline"
+                render={
+                  <Link to="/embeddings" search={{ document: document.id }} />
+                }
+                aria-label={`Locate ${document.filename} in embeddings`}
+              >
+                <LocateFixedIcon />
+                Locate in embeddings
+              </Button>
               <Button
                 variant="outline"
                 render={<a href={documentUrl(document.id)} />}
