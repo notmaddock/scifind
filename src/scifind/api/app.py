@@ -17,7 +17,7 @@ app.add_middleware(
         ).split(",")
         if origin.strip()
     ],
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST", "DELETE"],
 )
 app.include_router(documents_router)
 app.include_router(search_router)

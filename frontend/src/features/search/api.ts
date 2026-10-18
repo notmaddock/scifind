@@ -9,10 +9,6 @@ export type SearchResult = {
   page_number: number | null
 }
 
-export function documentDownloadUrl(id: string) {
-  return `${apiUrl}/api/documents/${encodeURIComponent(id)}/download`
-}
-
 export async function searchDocuments(query: string, signal: AbortSignal) {
   const url = new URL(`${apiUrl}/api/search`)
   url.searchParams.set('q', query)

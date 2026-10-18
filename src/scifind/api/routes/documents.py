@@ -3,7 +3,8 @@ from collections.abc import Sequence
 from uuid import UUID, uuid4
 from shutil import copyfileobj
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile
+from pydantic import BaseModel
 from fastapi.responses import FileResponse
 
 from scifind.documents.intake import DocumentIntakeError, extract_document
@@ -87,8 +88,32 @@ def upload_document(
         raise HTTPException(status_code=422, detail=str(error)) from error
 
 
-@router.get("/{document_id}/download")
-def download_document(document_id: UUID, processor: DocumentProcessorDep) -> FileResponse:
+class DocumentSummary(BaseModel):
+    id: str
+    filename: str
+    format: str
+
+
+@router.get("", response_model=list[DocumentSummary])
+def list_documents(processor: DocumentProcessorDep, q: str = "") -> list[DocumentSummary]:
+    result = processor.seeds.get(where={"type": "upload"}, include=["metadatas", "documents"])
+    query = q.strip().casefold()
+    documents = []
+    for identifier, metadata, text in zip(
+        result["ids"], result["metadatas"] or [], result["documents"] or []
+    ):
+        if metadata and (
+            not query
+            or query in str(metadata["filename"]).casefold()
+            or query in (text or "").casefold()
+        ):
+            documents.append(DocumentSummary(
+                id=identifier, filename=str(metadata["filename"]), format=str(metadata["format"])
+            ))
+    return sorted(documents, key=lambda document: (document.filename.casefold(), document.id))
+
+
+def document_file(document_id: UUID, processor: DocumentProcessor):
     identifier = str(document_id)
     result = processor.seeds.get(ids=[identifier], include=["metadatas"])
     metadatas = result["metadatas"]
@@ -98,11 +123,29 @@ def download_document(document_id: UUID, processor: DocumentProcessorDep) -> Fil
     file_format = metadata.get("format")
     if file_format not in {"pdf", "txt"}:
         raise HTTPException(status_code=404, detail="Document not found.")
-    original = UPLOAD_PATH / f"{identifier}.{file_format}"
+    return UPLOAD_PATH / f"{identifier}.{file_format}", metadata
+
+
+@router.delete("/{document_id}", status_code=204)
+def delete_document(document_id: UUID, processor: DocumentProcessorDep) -> Response:
+    original, _ = document_file(document_id, processor)
+    original.unlink(missing_ok=True)
+    processor.seeds.delete(where={"document_id": str(document_id)})
+    processor.seeds.delete(ids=[str(document_id)])
+    return Response(status_code=204)
+
+
+@router.get("/{document_id}/download")
+def download_document(
+    document_id: UUID, processor: DocumentProcessorDep, inline: bool = False
+) -> FileResponse:
+    original, metadata = document_file(document_id, processor)
     if not original.is_file():
         raise HTTPException(status_code=404, detail="Original file not found.")
     return FileResponse(
         original,
         filename=str(metadata["filename"]),
-        media_type="application/pdf" if file_format == "pdf" else "text/plain",
+        media_type="application/pdf" if metadata["format"] == "pdf" else "text/plain; charset=utf-8",
+        content_disposition_type="inline" if inline else "attachment",
+        headers={"X-Content-Type-Options": "nosniff"},
     )

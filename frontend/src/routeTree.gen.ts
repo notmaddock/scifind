@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SidebarRouteImport } from './routes/_sidebar'
 import { Route as SidebarIndexRouteImport } from './routes/_sidebar/index'
+import { Route as SidebarDocumentsIndexRouteImport } from './routes/_sidebar/documents/index'
 import { Route as SidebarEmbeddingsIndexRouteImport } from './routes/_sidebar/embeddings/index'
 import { Route as SidebarSearchIndexRouteImport } from './routes/_sidebar/search/index'
 import { Route as SidebarUploadIndexRouteImport } from './routes/_sidebar/upload/index'
@@ -22,6 +23,11 @@ const SidebarRoute = SidebarRouteImport.update({
 const SidebarIndexRoute = SidebarIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => SidebarRoute,
+} as any)
+const SidebarDocumentsIndexRoute = SidebarDocumentsIndexRouteImport.update({
+  id: '/documents/',
+  path: '/documents/',
   getParentRoute: () => SidebarRoute,
 } as any)
 const SidebarEmbeddingsIndexRoute = SidebarEmbeddingsIndexRouteImport.update({
@@ -42,12 +48,14 @@ const SidebarUploadIndexRoute = SidebarUploadIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof SidebarIndexRoute
+  '/documents/': typeof SidebarDocumentsIndexRoute
   '/embeddings/': typeof SidebarEmbeddingsIndexRoute
   '/search/': typeof SidebarSearchIndexRoute
   '/upload/': typeof SidebarUploadIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof SidebarIndexRoute
+  '/documents': typeof SidebarDocumentsIndexRoute
   '/embeddings': typeof SidebarEmbeddingsIndexRoute
   '/search': typeof SidebarSearchIndexRoute
   '/upload': typeof SidebarUploadIndexRoute
@@ -56,19 +64,21 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_sidebar': typeof SidebarRouteWithChildren
   '/_sidebar/': typeof SidebarIndexRoute
+  '/_sidebar/documents/': typeof SidebarDocumentsIndexRoute
   '/_sidebar/embeddings/': typeof SidebarEmbeddingsIndexRoute
   '/_sidebar/search/': typeof SidebarSearchIndexRoute
   '/_sidebar/upload/': typeof SidebarUploadIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/embeddings/' | '/search/' | '/upload/'
+  fullPaths: '/' | '/documents/' | '/embeddings/' | '/search/' | '/upload/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/embeddings' | '/search' | '/upload'
+  to: '/' | '/documents' | '/embeddings' | '/search' | '/upload'
   id:
     | '__root__'
     | '/_sidebar'
     | '/_sidebar/'
+    | '/_sidebar/documents/'
     | '/_sidebar/embeddings/'
     | '/_sidebar/search/'
     | '/_sidebar/upload/'
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof SidebarIndexRouteImport
+      parentRoute: typeof SidebarRoute
+    }
+    '/_sidebar/documents/': {
+      id: '/_sidebar/documents/'
+      path: '/documents'
+      fullPath: '/documents/'
+      preLoaderRoute: typeof SidebarDocumentsIndexRouteImport
       parentRoute: typeof SidebarRoute
     }
     '/_sidebar/embeddings/': {
@@ -120,6 +137,7 @@ declare module '@tanstack/react-router' {
 
 interface SidebarRouteChildren {
   SidebarIndexRoute: typeof SidebarIndexRoute
+  SidebarDocumentsIndexRoute: typeof SidebarDocumentsIndexRoute
   SidebarEmbeddingsIndexRoute: typeof SidebarEmbeddingsIndexRoute
   SidebarSearchIndexRoute: typeof SidebarSearchIndexRoute
   SidebarUploadIndexRoute: typeof SidebarUploadIndexRoute
@@ -127,6 +145,7 @@ interface SidebarRouteChildren {
 
 const SidebarRouteChildren: SidebarRouteChildren = {
   SidebarIndexRoute: SidebarIndexRoute,
+  SidebarDocumentsIndexRoute: SidebarDocumentsIndexRoute,
   SidebarEmbeddingsIndexRoute: SidebarEmbeddingsIndexRoute,
   SidebarSearchIndexRoute: SidebarSearchIndexRoute,
   SidebarUploadIndexRoute: SidebarUploadIndexRoute,

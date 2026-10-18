@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { documentDownloadUrl } from '#/features/search/api'
+import { documentUrl } from '#/features/documents/api'
 import { SearchPage } from '#/features/search/search-page'
 import { useSearch } from '#/features/search/use-search'
 
@@ -31,7 +31,7 @@ function SearchContainer({ q }: { q: string }) {
       isFetching={results.isFetching}
       isSuccess={results.isSuccess}
       error={results.error?.message}
-      getDownloadUrl={documentDownloadUrl}
+      getDownloadUrl={documentUrl}
       onQueryChange={setQuery}
       onSubmit={() =>
         void navigate({ to: '/search', search: { q: query.trim() } })

@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from '#/components/ui/sidebar'
-import { GraphStarIcon, SearchIcon, UploadIcon } from 'lucide-react'
+import { FilesIcon, GraphStarIcon, SearchIcon, UploadIcon } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 export const Route = createFileRoute('/_sidebar')({
@@ -26,6 +26,7 @@ type NavigationItem = {
 function Navigation() {
   const nav: NavigationItem[] = [
     { title: 'Search', icon: SearchIcon, href: '/search' },
+    { title: 'Documents', icon: FilesIcon, href: '/documents' },
     { title: 'Upload', icon: UploadIcon, href: '/upload' },
     { title: 'Embeddings', icon: GraphStarIcon, href: '/embeddings' },
   ]

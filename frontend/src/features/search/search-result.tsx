@@ -1,3 +1,4 @@
+import { DocumentPreview } from '#/features/documents/document-preview'
 import { DownloadIcon } from 'lucide-react'
 import type { SearchResult } from './api'
 
@@ -13,6 +14,7 @@ export function SearchResultCard({
   return (
     <article className="overflow-hidden rounded-lg border">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3">
+        <DocumentPreview document={result} pageNumber={result.page_number} />
         <a
           href={downloadUrl}
           className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
