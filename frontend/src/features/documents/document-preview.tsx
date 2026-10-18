@@ -13,27 +13,31 @@ import { documentUrl } from './api'
 type DocumentPreviewProps = {
   document: { id: string; filename: string }
   pageNumber?: number | null
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export function DocumentPreview({
   document,
   pageNumber,
+  open,
+  onOpenChange,
 }: DocumentPreviewProps) {
   const previewUrl = documentUrl(document.id, true)
   const viewerUrl = pageNumber ? `${previewUrl}#page=${pageNumber}` : previewUrl
 
   return (
-    <Dialog>
-      <DialogTrigger
-        render={<Button variant="outline" />}
-        aria-label={`Preview ${document.filename}`}
-      >
-        <EyeIcon />
-        Preview
-      </DialogTrigger>
-      <DialogContent
-        className="flex h-[85svh] flex-col sm:max-w-5xl"
-      >
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {open === undefined && (
+        <DialogTrigger
+          render={<Button variant="outline" />}
+          aria-label={`Preview ${document.filename}`}
+        >
+          <EyeIcon />
+          Preview
+        </DialogTrigger>
+      )}
+      <DialogContent className="flex h-[85svh] flex-col sm:max-w-5xl">
         <DialogHeader className="pr-8">
           <DialogTitle className="wrap-anywhere">
             {document.filename}
@@ -46,6 +50,7 @@ export function DocumentPreview({
         />
         <DialogFooter>
           <Button
+            nativeButton={false}
             variant="outline"
             render={
               <a href={viewerUrl} target="_blank" rel="noopener noreferrer" />
@@ -53,7 +58,10 @@ export function DocumentPreview({
           >
             Open in new tab
           </Button>
-          <Button render={<a href={documentUrl(document.id)} />}>
+          <Button
+            nativeButton={false}
+            render={<a href={documentUrl(document.id)} />}
+          >
             Download
           </Button>
         </DialogFooter>

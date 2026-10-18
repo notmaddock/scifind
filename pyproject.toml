@@ -26,6 +26,7 @@ dependencies = [
     "sentence-transformers>=6.1.0",
     "torch==2.14.1",
     "tqdm>=4.70.1",
+    "umap-learn>=0.5.12",
     "uvicorn",
 ]
 

@@ -16,6 +16,7 @@ export function useDeleteDocument() {
       await Promise.all([
         client.invalidateQueries({ queryKey: ['documents'] }),
         client.invalidateQueries({ queryKey: ['search'] }),
+        client.invalidateQueries({ queryKey: ['embeddings'] }),
       ])
     },
   })
