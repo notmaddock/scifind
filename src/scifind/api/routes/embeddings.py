@@ -50,7 +50,7 @@ def list_embeddings(
             ).fit_transform(result["embeddings"]),
         )
     else:
-        from umap import UMAP  # type: ignore[import-not-found]
+        from umap import UMAP  # type: ignore[import-untyped]
 
         positions = cast(
             PositionArray,
