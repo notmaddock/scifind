@@ -1,23 +1,44 @@
 import { useEffect, useRef, useState } from 'react'
 import { OrthographicView } from '@deck.gl/core'
 import type { OrthographicViewState } from '@deck.gl/core'
-import { LocateFixedIcon } from 'lucide-react'
+import { BoxesIcon, LocateFixedIcon } from 'lucide-react'
 import { Button } from '#/components/ui/button'
 import { ScatterplotLayer } from '@deck.gl/layers'
 import { DeckGL } from '@deck.gl/react'
 import { DocumentPreview } from '#/features/documents/document-preview'
 import type { EmbeddedDocument } from './api'
 
+const clusterColors: Color[] = [
+  [37, 99, 235, 255],
+  [234, 88, 12, 255],
+  [22, 163, 74, 255],
+  [147, 51, 234, 255],
+  [220, 38, 38, 255],
+  [8, 145, 178, 255],
+  [202, 138, 4, 255],
+  [219, 39, 119, 255],
+  [79, 70, 229, 255],
+  [101, 163, 13, 255],
+]
+
+export function clusterColor(cluster: number): Color {
+  return clusterColors[cluster % clusterColors.length]
+}
+
 const view = new OrthographicView({ id: 'embeddings', flipY: false })
 type Color = [number, number, number, number]
 
 export function EmbeddingsPlot({
   points,
+  labels,
   documentId,
   onClearFocus,
+  onConfigureClustering,
 }: {
+  labels?: Record<string, number>
   points: EmbeddedDocument[]
   documentId?: string
+  onConfigureClustering: () => void
   onClearFocus: () => void
 }) {
   const container = useRef<HTMLDivElement>(null)
@@ -81,6 +102,9 @@ export function EmbeddingsPlot({
     return () => observer.disconnect()
   }, [])
 
+  const color = (point: EmbeddedDocument): Color =>
+    labels?.[point.id] !== undefined ? clusterColor(labels[point.id]) : primary
+
   return (
     <>
       <div
@@ -111,15 +135,17 @@ export function EmbeddingsPlot({
               id: 'documents',
               data: points,
               getPosition: position,
-              getFillColor: focused
-                ? [primary[0], primary[1], primary[2], 45]
-                : primary,
+              getFillColor: (point) => {
+                const fill = color(point)
+                return focused ? [fill[0], fill[1], fill[2], 45] : fill
+              },
               getRadius: 6,
               radiusUnits: 'pixels',
               pickable: true,
               autoHighlight: true,
               updateTriggers: {
                 getPosition: [centerX, centerY, span],
+                getFillColor: [labels, primary, focused],
               },
               onHover: ({ object, x, y }) =>
                 setHover(object ? { document: object, x, y } : null),
@@ -135,7 +161,7 @@ export function EmbeddingsPlot({
                 id: 'located-document',
                 data: [focused],
                 getPosition: position,
-                getFillColor: primary,
+                getFillColor: color,
                 getRadius: 16,
                 radiusUnits: 'pixels',
                 stroked: true,
@@ -144,7 +170,10 @@ export function EmbeddingsPlot({
                 lineWidthUnits: 'pixels',
                 parameters: { depthCompare: 'always' },
                 pickable: true,
-                updateTriggers: { getPosition: [centerX, centerY, span] },
+                updateTriggers: {
+                  getPosition: [centerX, centerY, span],
+                  getFillColor: [labels, primary],
+                },
                 onHover: ({ object, x, y }) =>
                   setHover(object ? { document: object, x, y } : null),
                 onClick: () => {
@@ -154,17 +183,27 @@ export function EmbeddingsPlot({
               }),
           ]}
         />
-        <Button
-          variant="outline"
-          className="absolute top-2 right-2 z-10 rounded-2xl bg-background"
-          onClick={() => {
-            setViewState({ target: [0, 0, 0], zoom: 0 })
-            setHover(null)
-          }}
-        >
-          <LocateFixedIcon />
-          Recenter
-        </Button>
+        <div className="absolute top-2 right-2 z-10 flex gap-2">
+          <Button
+            variant="outline"
+            className="rounded-2xl bg-background"
+            onClick={onConfigureClustering}
+          >
+            <BoxesIcon />
+            Clustering
+          </Button>
+          <Button
+            variant="outline"
+            className="rounded-2xl bg-background"
+            onClick={() => {
+              setViewState({ target: [0, 0, 0], zoom: 0 })
+              setHover(null)
+            }}
+          >
+            <LocateFixedIcon />
+            Recenter
+          </Button>
+        </div>
         {hover && (
           <div
             role="tooltip"
@@ -181,6 +220,8 @@ export function EmbeddingsPlot({
             }}
           >
             {hover.document.filename}
+            {labels?.[hover.document.id] !== undefined &&
+              ` · Cluster ${labels[hover.document.id] + 1}`}
           </div>
         )}
       </div>

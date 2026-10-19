@@ -6,6 +6,7 @@ export function useEmbeddings(method: ProjectionMethod) {
   return useQuery({
     queryKey: ['embeddings', method],
     queryFn: ({ signal }) => getEmbeddings(method, signal),
-    staleTime: 'static',
+    staleTime: 0,
+    gcTime: 0,
   })
 }
