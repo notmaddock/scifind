@@ -2,6 +2,36 @@
 
 scifind is a semantic document finding program based on [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) (Apache 2.0).
 
+## Run with Docker Compose
+
+From the `scifind` directory, run:
+
+```bash
+docker compose up -d --build
+```
+
+Open http://localhost:3000. Docker builds the API and frontend, downloads the
+embedding model, and waits for the API before starting the frontend. The first
+build can take a while and needs internet access and several GB of disk space
+for the Python/ML dependencies. No `.env` file or local Python/Node setup is needed.
+Set `SCIFIND_PORT` to use a different frontend port, for example
+`SCIFIND_PORT=8080 docker compose up -d --build`.
+
+The frontend serves the app and proxies `/api/` to `api:8000` on the Compose
+network. Browser requests use the same origin as the frontend, including when
+accessing it from another machine. The API and embedded ChromaDB are internal;
+ChromaDB runs in the API process and does not need a separate database server.
+
+The `chroma_data` named volume stores ChromaDB, initialized from the included
+`base-embeddings-1pct.zip` on first creation. The `uploads` named volume keeps
+original uploaded files. Existing host `chroma/` and `uploads/` directories are
+not imported. Rebuilding or running `docker compose down` preserves both
+volumes; `docker compose down -v` deletes them and resets the app's data.
+
+Check status and logs with `docker compose ps` and `docker compose logs -f`.
+
+Note that first search and visualization runs could take a few seconds since loading the model into RAM takes time. By default the image does preload it but loading into RAM still takes ~15secs.
+
 ## Run locally
 
 From the `scifind` directory, run:
