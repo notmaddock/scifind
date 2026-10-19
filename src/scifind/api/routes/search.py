@@ -71,5 +71,5 @@ def search_documents(
                 return list(matches.values())
         if len(result["ids"][0]) < candidates or candidates == count:
             return list(matches.values())
-        
+
         candidates = min(candidates * 2, count)

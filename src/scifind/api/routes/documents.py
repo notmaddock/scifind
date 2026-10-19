@@ -1,8 +1,11 @@
+from pathlib import Path
 from typing import Annotated
+
 from collections.abc import Sequence
 from uuid import UUID, uuid4
 from shutil import copyfileobj
 
+from chromadb.api.types import Metadata
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile
 from pydantic import BaseModel
 from fastapi.responses import FileResponse
@@ -88,17 +91,21 @@ def upload_document(
         raise HTTPException(status_code=422, detail=str(error)) from error
 
 
-class DocumentSummary(BaseModel):
+class DocumentSummary(BaseModel):  # type: ignore[explicit-any]
     id: str
     filename: str
     format: str
 
 
-@router.get("", response_model=list[DocumentSummary])
-def list_documents(processor: DocumentProcessorDep, q: str = "") -> list[DocumentSummary]:
-    result = processor.seeds.get(where={"type": "upload"}, include=["metadatas", "documents"])
+@router.get("", response_model=list[DocumentSummary])  # type: ignore[misc]
+def list_documents(
+    processor: DocumentProcessorDep, q: str = ""
+) -> list[DocumentSummary]:
+    result = processor.seeds.get(
+        where={"type": "upload"}, include=["metadatas", "documents"]
+    )
     query = q.strip().casefold()
-    documents = []
+    documents: list[DocumentSummary] = []
     for identifier, metadata, text in zip(
         result["ids"], result["metadatas"] or [], result["documents"] or []
     ):
@@ -107,13 +114,23 @@ def list_documents(processor: DocumentProcessorDep, q: str = "") -> list[Documen
             or query in str(metadata["filename"]).casefold()
             or query in (text or "").casefold()
         ):
-            documents.append(DocumentSummary(
-                id=identifier, filename=str(metadata["filename"]), format=str(metadata["format"])
-            ))
-    return sorted(documents, key=lambda document: (document.filename.casefold(), document.id))
+            documents.append(
+                DocumentSummary(
+                    id=identifier,
+                    filename=str(metadata["filename"]),
+                    format=str(metadata["format"]),
+                )
+            )
+
+    def sort_key(document: DocumentSummary) -> tuple[str, str]:
+        return document.filename.casefold(), document.id
+
+    return sorted(documents, key=sort_key)
 
 
-def document_file(document_id: UUID, processor: DocumentProcessor):
+def document_file(
+    document_id: UUID, processor: DocumentProcessor
+) -> tuple[Path, Metadata]:
     identifier = str(document_id)
     result = processor.seeds.get(ids=[identifier], include=["metadatas"])
     metadatas = result["metadatas"]
@@ -126,7 +143,7 @@ def document_file(document_id: UUID, processor: DocumentProcessor):
     return UPLOAD_PATH / f"{identifier}.{file_format}", metadata
 
 
-@router.delete("/{document_id}", status_code=204)
+@router.delete("/{document_id}", status_code=204)  # type: ignore[misc]
 def delete_document(document_id: UUID, processor: DocumentProcessorDep) -> Response:
     original, _ = document_file(document_id, processor)
     original.unlink(missing_ok=True)
@@ -135,7 +152,7 @@ def delete_document(document_id: UUID, processor: DocumentProcessorDep) -> Respo
     return Response(status_code=204)
 
 
-@router.get("/{document_id}/download")
+@router.get("/{document_id}/download")  # type: ignore[misc]
 def download_document(
     document_id: UUID, processor: DocumentProcessorDep, inline: bool = False
 ) -> FileResponse:
@@ -145,7 +162,11 @@ def download_document(
     return FileResponse(
         original,
         filename=str(metadata["filename"]),
-        media_type="application/pdf" if metadata["format"] == "pdf" else "text/plain; charset=utf-8",
+        media_type=(
+            "application/pdf"
+            if metadata["format"] == "pdf"
+            else "text/plain; charset=utf-8"
+        ),
         content_disposition_type="inline" if inline else "attachment",
         headers={"X-Content-Type-Options": "nosniff"},
     )
