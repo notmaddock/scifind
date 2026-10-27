@@ -2,6 +2,24 @@
 
 scifind is a semantic document finding program based on [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) (Apache 2.0).
 
+## Screenshots
+
+### Search results
+
+![Search results](docs/assets/screenshots/search-results.png)
+
+### Document management
+
+![Document management](docs/assets/screenshots/documents.png)
+
+### Embedding map (UMAP)
+
+![Embedding map (UMAP)](docs/assets/screenshots/embedding-map.png)
+
+### K-Means clustering
+
+![K-Means clustering](docs/assets/screenshots/k-means-clustering.png)
+
 ## Run with Docker Compose
 
 From the `scifind` directory, run:
